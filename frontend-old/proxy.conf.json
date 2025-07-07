@@ -1,0 +1,12 @@
+{
+  "/bff": {
+    "target": "http://bff:8081",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/api": {
+    "target": "http://bff:8081",
+    "secure": false,
+    "changeOrigin": true
+  }
+}

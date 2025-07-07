@@ -1,0 +1,40 @@
+version: "3.8"
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.1.0
+    container_name: bff-keycloak
+    command: start-dev --import-realm
+    ports: ["8080:8080"]
+    volumes:
+      - ./keycloak/realm.json:/opt/keycloak/data/import/realm.json
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: test01
+
+
+  bff:
+    container_name: bff-bff
+    build: ./bff
+    ports: ["7081:8081"]
+    environment:
+      - SPRING_OIDC_ISSUER=http://keycloak:8080/realms/myrealm
+      - SPRING_OIDC_CLIENT_ID=bff-client
+      - SPRING_OIDC_CLIENT_SECRET=bff-secret
+    depends_on: [keycloak, apis]
+    volumes:
+      - ~/.m2:/root/.m2  # monte le cache Maven du host dans le conteneur
+
+  apis:
+    container_name: bff-apis
+    build: ./apis
+    ports: ["8084:8084"]
+    environment:
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWK-SET-URI=http://keycloak:8080/realms/myrealm/protocol/openid-connect/certs
+    volumes:
+      - ~/.m2:/root/.m2  # monte le cache Maven du host dans le conteneur
+      
+  angular:
+    container_name: bff-angular
+    build: ./frontend
+    ports: ["4200:80"]
+    depends_on: [bff]

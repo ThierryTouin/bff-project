@@ -1,0 +1,28 @@
+server:
+  port: 8081
+
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          bff-client:
+            provider: keycloak
+            client-id: ${SPRING_OIDC_CLIENT_ID}
+            client-secret: ${SPRING_OIDC_CLIENT_SECRET}
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            scope: openid,profile,api.read
+        provider:
+          keycloak:
+            issuer-uri: ${SPRING_OIDC_ISSUER}
+
+#  main:
+#    web-application-type: reactive
+
+  session:
+    cookie:
+      http-only: true
+      same-site: lax
+
+
