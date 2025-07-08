@@ -7,9 +7,17 @@
       "secret": "secret",
       "enabled": true,
       "protocol": "openid-connect",
-      "redirectUris": ["http://localhost:4200/*"],
+      "redirectUris": ["http://localhost:4200/*", "http://localhost:8081/*"],
       "publicClient": false,
-      "standardFlowEnabled": true
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": true,
+      "defaultClientScopes": [
+        "web-origins",
+        "profile",
+        "email",
+        "roles"
+      ]
     }
   ],
   "users": [
@@ -19,7 +27,8 @@
       "credentials": [
         {
           "type": "password",
-          "value": "password"
+          "value": "password",
+          "temporary": false
         }
       ]
     }

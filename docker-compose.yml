@@ -8,8 +8,8 @@ services:
     volumes:
       - ./keycloak/realm.json:/opt/keycloak/data/import/realm.json
     environment:
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: test01
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: test01
 
 
   bff:
