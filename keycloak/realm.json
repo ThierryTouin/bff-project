@@ -4,7 +4,7 @@
   "clients": [
     {
       "clientId": "bff-client",
-      "secret": "secret",
+      "secret": "bff-secret",
       "enabled": true,
       "protocol": "openid-connect",
       "redirectUris": ["http://localhost:4200/*", "http://localhost:8081/*"],
