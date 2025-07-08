@@ -56,5 +56,7 @@ Thierry – Architecte transverse en informatique, passionné d’open source.
 
 
 ## Vrac
+http://localhost:8081/hello-public
+
 
 https://github.com/brakmic/Angular-BFF-Keycloak

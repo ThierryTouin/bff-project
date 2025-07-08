@@ -1,4 +1,4 @@
-version: "3.8"
+#version: "3.8"
 services:
   keycloak:
     image: quay.io/keycloak/keycloak:26.1.0
@@ -15,26 +15,34 @@ services:
   bff:
     container_name: bff-bff
     build: ./bff
-    ports: ["7081:8081"]
+    ports: ["8081:8081"]
     environment:
-      - SPRING_OIDC_ISSUER=http://keycloak:8080/realms/myrealm
+      - SPRING_OIDC_ISSUER=http://bff-keycloak:8080/realms/myrealm
       - SPRING_OIDC_CLIENT_ID=bff-client
       - SPRING_OIDC_CLIENT_SECRET=bff-secret
-    depends_on: [keycloak, apis]
+    #depends_on: [keycloak, apis]
+    depends_on: [keycloak]
     volumes:
-      - ~/.m2:/root/.m2  # monte le cache Maven du host dans le conteneur
+      - ~/.m2:/home/maven/.m2  # si l’utilisateur du conteneur est `maven`
+      - ./bff:/app
 
-  apis:
-    container_name: bff-apis
-    build: ./apis
-    ports: ["8084:8084"]
-    environment:
-      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWK-SET-URI=http://keycloak:8080/realms/myrealm/protocol/openid-connect/certs
-    volumes:
-      - ~/.m2:/root/.m2  # monte le cache Maven du host dans le conteneur
+
+  # apis:
+  #   container_name: bff-apis
+  #   build: ./apis
+  #   ports: ["8084:8084"]
+  #   environment:
+  #     - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWK-SET-URI=http://keycloak:8080/realms/myrealm/protocol/openid-connect/certs
+  #   volumes:
+  #     - ~/.m2:/root/.m2  # monte le cache Maven du host dans le conteneur
       
   angular:
     container_name: bff-angular
     build: ./frontend
-    ports: ["4200:80"]
+    ports: ["4200:4200"]
     depends_on: [bff]
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules   # évite les conflits node_modules host <-> container
+    environment:
+      - CHOKIDAR_USEPOLLING=true  # pour que le watcher fonctionne dans Docker

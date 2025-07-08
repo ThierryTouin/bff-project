@@ -20,9 +20,22 @@ spring:
 #  main:
 #    web-application-type: reactive
 
-  session:
-    cookie:
-      http-only: true
-      same-site: lax
+  # session:
+  #   cookie:
+  #     http-only: true
+  #     same-site: lax
 
 
+  devtools:
+    restart:
+      enabled: true
+      exclude: static/**,public/**
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.security.oauth2: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.boot.autoconfigure.security.oauth2: DEBUG
+    org.springframework.security.oauth2.client: DEBUG
+    org.springframework.security.oauth2.client.registration: DEBUG
