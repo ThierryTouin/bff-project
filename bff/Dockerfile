@@ -4,4 +4,8 @@ COPY pom.xml .
 COPY src ./src
 RUN mvn clean package -DskipTests
 
-ENTRYPOINT ["mvn", "spring-boot:run"]
+COPY wait-for-keycloak.sh /app/wait-for-keycloak.sh
+RUN chmod +x /app/wait-for-keycloak.sh
+ENTRYPOINT ["/app/wait-for-keycloak.sh"]
+
+CMD ["mvn", "spring-boot:run"]

@@ -46,3 +46,10 @@ services:
       - /app/node_modules   # évite les conflits node_modules host <-> container
     environment:
       - CHOKIDAR_USEPOLLING=true  # pour que le watcher fonctionne dans Docker
+
+
+  nginx:
+    container_name: bff-nginx
+    build: ./nginx
+    ports:
+      - 3001:80

@@ -22,15 +22,29 @@ export class AppComponent {
     window.location.href = '/logout';
   }
 
-  callApi() {
-    this.authService.callPublicHello().subscribe(data => {
+  callDirectPublicApi() {
+    this.authService.callDirectPublicHello().subscribe(data => {
       this.helloMessage = data;
     });
   }
 
-  callSecApi() {
-    this.authService.callHello().subscribe(data => {
+  callDirectSecuApi() {
+    this.authService.callDirectSecuHello().subscribe(data => {
       this.helloMessage = data;
     });
   }
+
+  callNginxPublicApi() {
+    this.authService.callNginxPublicHello().subscribe(data => {
+      this.helloMessage = data;
+    });
+  }
+
+  callNginxSecuHello() {
+    this.authService.callNginxSecuHello().subscribe(data => {
+      this.helloMessage = data;
+    });
+  }
+
+
 }

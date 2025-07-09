@@ -1,8 +1,10 @@
 <div style="text-align:center">
   <h1>Welcome to the Angular BFF Example!</h1>
   <button (click)="login()">Login</button>
-  <button (click)="logout()">Logout</button>
-  <button (click)="callApi()">Call Public API</button>
-  <button (click)="callSecApi()">Call Secured API</button>
+  <button (click)="logout()">Logout</button><br>
+  <button (click)="callDirectPublicApi()">Call Direct Public API</button>
+  <button (click)="callDirectSecuApi()">Call Direct Secured API</button><br>
+  <button (click)="callNginxPublicApi()">Call Nginx Public API</button>
+  <button (click)="callNginxSecuHello()">Call Nginx Secured API</button><br>
   <p>{{ helloMessage }}</p>
 </div>

@@ -60,4 +60,9 @@ http://localhost:8081/api/public/hello
 http://localhost:8081/api/secur/hello
 
 
+http://localhost:3001/api/secur/hello
+http://localhost:3001/api/public/hello
+http://localhost:3001/
+
+
 https://github.com/brakmic/Angular-BFF-Keycloak

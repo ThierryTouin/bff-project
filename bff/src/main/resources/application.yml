@@ -1,5 +1,6 @@
 server:
   port: 8081
+  forward-headers-strategy: framework ## Cela dit à Spring de se baser sur les en-têtes X-Forwarded-* pour construire les URLs de redirection 
 
 spring:
   security:
@@ -31,6 +32,7 @@ spring:
     restart:
       enabled: true
       exclude: static/**,public/**
+
 
 logging:
   level:

@@ -14,7 +14,8 @@ public class CorsGlobalConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**") // ou "/api/**" si tu veux restreindre
-                        .allowedOrigins("http://localhost:4200")
+                        // .allowedOrigins("http://localhost:4200")
+                        .allowedOrigins("http://localhost:3001")
                         .allowedMethods("*")
                         .allowedHeaders("*")
                         .allowCredentials(true);
