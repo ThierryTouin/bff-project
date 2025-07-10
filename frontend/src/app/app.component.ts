@@ -15,15 +15,21 @@ export class AppComponent {
   constructor(private authService: AuthService) {}
 
   login() {
-    window.location.href = '/oauth2/authorization/keycloak';
+    window.location.href = 'http://localhost:8081/oauth2/authorization/bff-client';
   }
 
   logout() {
-    window.location.href = '/logout';
+    window.location.href = 'http://localhost:8081/logout';
   }
 
   callDirectPublicApi() {
     this.authService.callDirectPublicHello().subscribe(data => {
+      this.helloMessage = data;
+    });
+  }
+
+  userInfo() {
+    this.authService.userInfo().subscribe(data => {
       this.helloMessage = data;
     });
   }

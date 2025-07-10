@@ -12,7 +12,8 @@ spring:
             client-id: ${SPRING_OIDC_CLIENT_ID}
             client-secret: ${SPRING_OIDC_CLIENT_SECRET}
             authorization-grant-type: authorization_code
-            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            #redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            redirect-uri: "http://localhost:3001/login/oauth2/code/{registrationId}"
             #scope: openid,profile,api.read
             scope: openid,profile
         provider:

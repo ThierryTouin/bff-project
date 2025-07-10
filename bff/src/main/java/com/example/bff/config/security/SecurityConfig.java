@@ -16,8 +16,12 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable()) // utile pour simplifier les appels depuis Angular pendant le dev
             .authorizeHttpRequests(authz -> authz
-                .requestMatchers("/api/public/**").permitAll() // accessible sans authent
-                .requestMatchers("/api/secur/**").authenticated() // nécessite authent
+                // accessible sans authent
+                .requestMatchers("/api/public/**").permitAll() 
+                // nécessite authent
+                .requestMatchers("/login/**").authenticated() 
+                .requestMatchers("/logout/**").authenticated() 
+                .requestMatchers("/api/secur/**").authenticated() 
                 .anyRequest().denyAll() // par défaut, tout le reste est bloqué
             )
             .oauth2Login(oauth2 -> oauth2

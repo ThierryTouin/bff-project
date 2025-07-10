@@ -7,7 +7,7 @@
       "secret": "bff-secret",
       "enabled": true,
       "protocol": "openid-connect",
-      "redirectUris": ["http://localhost:4200/*", "http://localhost:8081/*"],
+      "redirectUris": ["http://localhost:4200/*", "http://localhost:8081/*", "http://localhost:3001/*"],
       "publicClient": false,
       "standardFlowEnabled": true,
       "directAccessGrantsEnabled": true,
