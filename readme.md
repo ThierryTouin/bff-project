@@ -8,11 +8,48 @@ Exemple d’architecture Backend For Frontend (BFF) utilisant :
 - Frontend Angular 18 en mode session (cookie `JSESSIONID`),
 - Docker Compose pour orchestrer Keycloak, backend et frontend.
 
+```mermaid
+graph TD
+  subgraph Reverse Proxy
+    nginx[NGINX<br/>Port 3001]
+  end
+
+  subgraph Frontend
+    angular[Angular App<br/>Port 4200]
+  end
+
+  subgraph Backend
+    bff[BFF - Spring Boot<br/>Port 8081]
+    keycloak[Keycloak<br/>Port 8080]
+  end
+
+  nginx -->|static resources| angular
+  nginx -->|"/api, /oauth2, /login, /logout"| bff
+
+  angular -->|API Calls + Auth| nginx
+
+  bff -->|OIDC Token Validation| keycloak
+
+  keycloak -->|Realm Import| realm[realm.json]
+
+  %% Optionnel : API backend si activé un jour
+  %% bff -->|Calls secured REST API| apis[APIs (commented out)]
+
+  classDef container fill:#f9f,stroke:#333,stroke-width:1px;
+  class nginx,angular,bff,keycloak container;
+
+```
+
 ## Démarrage
 
 ```bash
 docker-compose up --build
 ```
+
+Entrez dans le système par http://localhost:3001 
+
+(user / password pour vous logger dans keycloak)
+
 
 Frontend : http://localhost:4200
 
