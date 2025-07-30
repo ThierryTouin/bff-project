@@ -20,7 +20,6 @@ public class SecurityConfig {
     ) throws Exception {
 
 
-
         
         http
             //.csrf(csrf -> csrf.disable()) // utile pour simplifier les appels depuis Angular pendant le dev

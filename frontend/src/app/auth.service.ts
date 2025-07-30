@@ -1,6 +1,6 @@
 // frontend/src/app/auth.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable()
@@ -52,15 +52,30 @@ export class AuthService {
   // 🔽 Nouveau appel POST vers NGINX
   postToNginx(data: any): Observable<string> {
     console.log("postToNginx()", data);
+
+    // Lire le cookie XSRF-TOKEN manuellement
+    const xsrfToken = this.getCookie('XSRF-TOKEN');
+
+    // Préparer les headers avec le token
+    const headers = new HttpHeaders({
+      'X-XSRF-TOKEN': xsrfToken || ''
+    });
+
+
     return this.http.post(
       'http://localhost:3001/api/secur/post', 
       data, 
       { 
+        headers: headers,
         responseType: 'text', 
         withCredentials: true // for xsrf // 🔥 essentiel pour que Angular envoie les cookies
       }
     );
   }
 
+  private getCookie(name: string): string | null {
+    const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+    return match ? decodeURIComponent(match[2]) : null;
+  }
 
 }
