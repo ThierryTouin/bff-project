@@ -4,6 +4,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.context.annotation.Bean;
 
 @Configuration
@@ -11,10 +13,18 @@ import org.springframework.context.annotation.Bean;
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http,
-                                                    OidcTokenLogger oidcTokenLogger) throws Exception {
+    public SecurityFilterChain securityFilterChain(
+        HttpSecurity http,
+        OidcTokenLogger oidcTokenLogger,
+        CsrfLoggerFilter csrfLoggerFilter
+    ) throws Exception {
+
+
+        
         http
-            .csrf(csrf -> csrf.disable()) // utile pour simplifier les appels depuis Angular pendant le dev
+            //.csrf(csrf -> csrf.disable()) // utile pour simplifier les appels depuis Angular pendant le dev
+            .csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+            .addFilterAfter(csrfLoggerFilter, UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(authz -> authz
                 // accessible sans authent
                 .requestMatchers("/api/public/**").permitAll() 

@@ -52,5 +52,10 @@ export class AppComponent {
     });
   }
 
+  postNginxSecuHello() {
+    this.authService.postToNginx({ message: 'Hello from Angular' }).subscribe(data => {
+      this.helloMessage = data;
+    });
+  }
 
 }
