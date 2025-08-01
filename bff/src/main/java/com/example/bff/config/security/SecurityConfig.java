@@ -6,6 +6,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.context.annotation.Bean;
 
 @Configuration
@@ -36,7 +37,14 @@ public class SecurityConfig {
             )
             .oauth2Login(oauth2 -> oauth2
                 .successHandler(oidcTokenLogger)
-            );
+            )       
+            // .logout(logout -> logout
+            // .logoutUrl("/logout")
+            // .logoutSuccessUrl("/logout-success") // Redirection après déconnexion
+            // .invalidateHttpSession(true)
+            // .deleteCookies("JSESSIONID", "XSRF-TOKEN")
+            // .permitAll())
+            ;
             // .oauth2ResourceServer(oauth2 -> oauth2
             //     .jwt() // nécessaire si tu veux sécuriser avec un token d'accès et non une session
             // );

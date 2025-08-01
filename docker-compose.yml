@@ -15,7 +15,9 @@ services:
   bff:
     container_name: bff-bff
     build: ./bff
-    ports: ["8081:8081"]
+    ports:
+      - "8081:8081"
+      - "5005:5005"  # 🔥 Port de debug
     environment:
       - SPRING_OIDC_ISSUER=http://bff-keycloak:8080/realms/myrealm
       - SPRING_OIDC_CLIENT_ID=bff-client
