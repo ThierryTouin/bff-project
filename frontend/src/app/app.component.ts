@@ -15,11 +15,11 @@ export class AppComponent {
   constructor(private authService: AuthService) {}
 
   login() {
-    window.location.href = 'http://localhost:8081/oauth2/authorization/bff-client';
+    window.location.href = 'http://localhost:3001/oauth2/authorization/bff-client';
   }
 
   logout() {
-    window.location.href = 'http://localhost:8081/logout';
+    window.location.href = 'http://localhost:3001/logout';
   }
 
   callDirectPublicApi() {
