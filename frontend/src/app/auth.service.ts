@@ -73,10 +73,17 @@ export class AuthService {
     );
   }
 
+  // private getCookie(name: string): string | null {
+  //   const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+  //   return match ? decodeURIComponent(match[2]) : null;
+  //   //return  match ? btoa(match[2]) : null;
+  // }
+
   private getCookie(name: string): string | null {
-    const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-    //return match ? decodeURIComponent(match[2]) : null;
-    return  match ? btoa(match[2]) : null;
+    const matches = document.cookie.match(new RegExp(
+      '(?:^|; )' + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + '=([^;]*)'
+    ));
+    return matches ? decodeURIComponent(matches[1]) : null;
   }
 
 }

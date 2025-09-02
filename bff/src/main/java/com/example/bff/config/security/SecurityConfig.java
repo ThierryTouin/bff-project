@@ -7,6 +7,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfFilter;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.context.annotation.Bean;
 
 @Configuration
@@ -20,11 +21,17 @@ public class SecurityConfig {
         CsrfLoggerFilter csrfLoggerFilter
     ) throws Exception {
 
-
+        CookieCsrfTokenRepository repo = CookieCsrfTokenRepository.withHttpOnlyFalse();
+        // repo.setHeaderName("x-xsrf-token");
         
         http
             //.csrf(csrf -> csrf.disable()) // utile pour simplifier les appels depuis Angular pendant le dev
-            .csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+            //.csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+            
+            .csrf(csrf -> csrf
+                .csrfTokenRepository(repo)
+                .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler()) // <--- sans XOR
+            )
             .addFilterAfter(csrfLoggerFilter, UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(authz -> authz
                 // accessible sans authent
