@@ -36,6 +36,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(authz -> authz
                 // accessible sans authent
                 .requestMatchers("/api/public/**").permitAll() 
+                .requestMatchers("/swagger-ui/**","/v3/api-docs/**").permitAll() 
                 // nécessite authent
                 .requestMatchers("/login/**").authenticated() 
                 .requestMatchers("/logout/**").authenticated() 

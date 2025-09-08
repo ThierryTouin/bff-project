@@ -58,6 +58,8 @@ Backend : http://localhost:8081
 Keycloak : http://localhost:8080
 
 
+http://localhost:8081/swagger-ui/index.html en http 403 !!!!
+
 ## Fonctionnalités
 
 Authentification via Keycloak (OIDC),
