@@ -25,32 +25,34 @@ public class SecurityConfig {
         // repo.setHeaderName("x-xsrf-token");
         
         http
-            //.csrf(csrf -> csrf.disable()) // utile pour simplifier les appels depuis Angular pendant le dev
-            //.csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
-            
             .csrf(csrf -> csrf
+                .ignoringRequestMatchers(
+                    "/swagger-ui/**",
+                    "/v3/api-docs/**",
+                    "/swagger-ui.html",
+                    "/webjars/**"
+                )
                 .csrfTokenRepository(repo)
-                .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler()) // <--- sans XOR
+                .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
             )
             .addFilterAfter(csrfLoggerFilter, UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(authz -> authz
-                // accessible sans authent
-                .requestMatchers("/api/public/**").permitAll() 
+                .requestMatchers("/api/public/**").permitAll()
                 .requestMatchers(
                     "/swagger-ui/**",
                     "/v3/api-docs/**",
-                    "/swagger-ui.html"
-                ).permitAll() 
-                .requestMatchers("/actuator/**").permitAll()
-                // nécessite authent
-                .requestMatchers("/login/**").authenticated() 
-                .requestMatchers("/logout/**").authenticated() 
-                .requestMatchers("/api/secur/**").authenticated() 
-                .anyRequest().denyAll() // par défaut, tout le reste est bloqué
+                    "/swagger-ui.html",
+                    "/webjars/**",
+                    "/actuator/**"
+                ).permitAll()
+                .requestMatchers("/login/**").authenticated()
+                .requestMatchers("/logout/**").authenticated()
+                .requestMatchers("/api/secur/**").authenticated()
+                .anyRequest().denyAll()
             )
             .oauth2Login(oauth2 -> oauth2
                 .successHandler(oidcTokenLogger)
-            )       
+            );
 
 
         return http.build();
