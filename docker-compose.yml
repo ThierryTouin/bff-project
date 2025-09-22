@@ -40,7 +40,10 @@ services:
       
   angular:
     container_name: bff-angular
-    build: ./frontend
+    build: 
+        context: ./frontend
+        dockerfile: Dockerfile-prod
+        #dockerfile: Dockerfile
     ports: ["4200:4200"]
     depends_on: [bff]
     volumes:
