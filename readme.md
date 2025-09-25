@@ -46,19 +46,22 @@ graph TD
 docker-compose up --build
 ```
 
-Entrez dans le système par http://localhost:3001 
+> Entrez dans le système par http://localhost:3001 
 
 (user / password pour vous logger dans keycloak)
 
+Accès direct au container (non recomandé)
+- Frontend : http://localhost:4200
 
-Frontend : http://localhost:4200
+- Backend : http://localhost:8081
 
-Backend : http://localhost:8081
+- Keycloak : http://localhost:8080
 
-Keycloak : http://localhost:8080
+### Différent test
 
-
-http://localhost:8081/swagger-ui/index.html en http 403 !!!!
+- swagger : http://localhost:8081/swagger-ui/index.html en http 403 !!!!
+- page 404 : http://localhost:3001/test404 (ne fonctionne seulement si le fichier `./frontend/Dockerfile-prod` est pris en compte par le docker-compose - frontend buildé)
+- page 500 : http://localhost:3001/test500 (ne fonctionne seulement si le fichier `./frontend/Dockerfile-prod` est pris en compte par le docker-compose - frontend buildé)
 
 ## Fonctionnalités
 

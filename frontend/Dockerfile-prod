@@ -8,6 +8,11 @@ RUN npm run build --prod
 FROM nginx:1.23-alpine
 COPY --from=build /app/dist/bff-angular/browser /usr/share/nginx/html
 
-COPY ./nginx.conf /etc/nginx/conf.d/default.conf
+COPY ./nginx/nginx.conf /etc/nginx/conf.d/default.conf
+
+# Copie des pages d’erreur personnalisées
+COPY nginx/404.html /usr/share/nginx/html/404.html
+COPY nginx/500.html /usr/share/nginx/html/500.html
+
 
 CMD ["nginx", "-g", "daemon off;"]
