@@ -25,36 +25,35 @@ public class SecurityConfig {
         // repo.setHeaderName("x-xsrf-token");
         
         http
-            //.csrf(csrf -> csrf.disable()) // utile pour simplifier les appels depuis Angular pendant le dev
-            //.csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
-            
             .csrf(csrf -> csrf
+                .ignoringRequestMatchers(
+                    "/swagger-ui/**",
+                    "/v3/api-docs/**",
+                    "/swagger-ui.html",
+                    "/webjars/**"
+                )
                 .csrfTokenRepository(repo)
-                .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler()) // <--- sans XOR
+                .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
             )
             .addFilterAfter(csrfLoggerFilter, UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(authz -> authz
-                // accessible sans authent
-                .requestMatchers("/api/public/**").permitAll() 
-                // nécessite authent
-                .requestMatchers("/login/**").authenticated() 
-                .requestMatchers("/logout/**").authenticated() 
-                .requestMatchers("/api/secur/**").authenticated() 
-                .anyRequest().denyAll() // par défaut, tout le reste est bloqué
+                .requestMatchers("/api/public/**").permitAll()
+                .requestMatchers(
+                    "/swagger-ui/**",
+                    "/v3/api-docs/**",
+                    "/swagger-ui.html",
+                    "/webjars/**",
+                    "/actuator/**"
+                ).permitAll()
+                .requestMatchers("/login/**").authenticated()
+                .requestMatchers("/logout/**").authenticated()
+                .requestMatchers("/api/secur/**").authenticated()
+                .anyRequest().denyAll()
             )
             .oauth2Login(oauth2 -> oauth2
                 .successHandler(oidcTokenLogger)
-            )       
-            // .logout(logout -> logout
-            // .logoutUrl("/logout")
-            // .logoutSuccessUrl("/logout-success") // Redirection après déconnexion
-            // .invalidateHttpSession(true)
-            // .deleteCookies("JSESSIONID", "XSRF-TOKEN")
-            // .permitAll())
-            ;
-            // .oauth2ResourceServer(oauth2 -> oauth2
-            //     .jwt() // nécessaire si tu veux sécuriser avec un token d'accès et non une session
-            // );
+            );
+
 
         return http.build();
     }
