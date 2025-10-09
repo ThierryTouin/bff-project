@@ -11,7 +11,7 @@ usage() {
     echo
     echo "  up           : démarre toute la stack"
     echo "  up service   : démarre uniquement le service spécifié"
-    echo "  down         : arrête et nettoie la stack"
+    echo "  clean        : arrête et nettoie la stack"
     echo "  list         : liste les services disponibles"
     echo
     exit 1
@@ -42,7 +42,7 @@ case "$1" in
             fi
         fi
         ;;
-    down)
+    clean)
         echo "🛑 Arrêt de la stack..."
         docker compose -p $PROJECT_NAME down --volumes --rmi local
 

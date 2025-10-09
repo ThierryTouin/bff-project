@@ -57,6 +57,34 @@ Accès direct au container (non recomandé)
 
 - Keycloak : http://localhost:8080
 
+## Ajout de swagger-ui en passant par nginx
+- Ajout des règles location /swagger-ui et location /v3/api-docs dans nginx.conf
+- Dans Bff, 
+  - Ajout dans le pom.xml
+
+      ```
+        <!-- swagger ui -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>2.5.0</version>
+        </dependency>
+      ```
+
+  - Création de la classe OpenApiConfig
+  - Ajout de la configuration dans application.yml
+
+      ```
+      # application.properties
+      springdoc:
+        api-docs.path: /v3/api-docs
+        # Indique explicitement à Swagger-UI l'URL du JSON (optionnel si default)
+        swagger-ui:
+          url: /v3/api-docs
+          # (optionnel) si tu veux exposer la UI sous /swagger-ui.html ou autre
+          path: /swagger-ui.html    
+      ```
+
 ### Différent test
 
 - swagger : http://localhost:8081/swagger-ui/index.html en http 403 !!!!

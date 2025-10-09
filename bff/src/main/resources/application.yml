@@ -43,3 +43,13 @@ logging:
     org.springframework.boot.autoconfigure.security.oauth2: DEBUG
     org.springframework.security.oauth2.client: DEBUG
     org.springframework.security.oauth2.client.registration: DEBUG
+
+
+# application.properties
+springdoc:
+  api-docs.path: /v3/api-docs
+  # Indique explicitement à Swagger-UI l'URL du JSON (optionnel si default)
+  swagger-ui:
+    url: /v3/api-docs
+    # (optionnel) si tu veux exposer la UI sous /swagger-ui.html ou autre
+    path: /swagger-ui.html    

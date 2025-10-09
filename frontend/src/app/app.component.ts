@@ -22,6 +22,10 @@ export class AppComponent {
     window.location.href = 'http://localhost:3001/logout';
   }
 
+  swagger() {
+    window.open('http://localhost:3001/swagger-ui/index.html', '_blank');
+  }
+
   callDirectPublicApi() {
     this.authService.callDirectPublicHello().subscribe(data => {
       this.helloMessage = data;
