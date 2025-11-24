@@ -147,3 +147,99 @@ http://bff-keycloak:8080/realms/myrealm/protocol/openid-connect/auth?response_ty
 
 
 http://bff-keycloak:8080/realms/myrealm/protocol/openid-connect/auth?response_type=code&client_id=bff-client&scope=openid%20profile&state=fp8gpOOwnh4k8NXEdZ1saOYLdr406mvipC28FMDzTg4%3D&redirect_uri=http://localhost/login/oauth2/code/bff-client&nonce=BJKFODRnnAqnaYK7E_O-JmDZbz44xNBxnhELSdrlXQ8
+
+
+
+
+@RestController
+public class AuthController {
+
+    @GetMapping("/login")
+    public void login(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        // Récupérer le paramètre clientId
+        String clientId = request.getParameter("clientId");
+
+        // Construire l'URL de redirection vers OIDC avec le paramètre clientId
+        String redirectUrl = "/oauth2/authorization/bff-client";
+        if (clientId != null) {
+            redirectUrl += "?clientId=" + clientId;
+        }
+
+        // Rediriger vers le point d'entrée OIDC
+        response.sendRedirect(redirectUrl);
+    }
+
+    @GetMapping("/login/success")
+    public void loginSuccess(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        // Récupérer le paramètre clientId après authentification
+        String clientId = request.getParameter("clientId");
+
+        // Rediriger vers le frontend avec le paramètre clientId
+        String frontendUrl = "http://localhost:3001";
+        if (clientId != null) {
+            frontendUrl += "?clientId=" + clientId;
+        }
+
+        response.sendRedirect(frontendUrl);
+    }
+}
+
+// spring security
+
+@Override
+protected void configure(HttpSecurity http) throws Exception {
+    http
+        .authorizeRequests()
+            .anyRequest().authenticated()
+            .and()
+        .oauth2Login()
+            .defaultSuccessUrl("/login/success", true);
+}
+
+
+// 
+
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { AuthService } from './auth.service';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent implements OnInit {
+  clientId: string | null = null;
+
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private authService: AuthService // Réintégration d'AuthService
+  ) {}
+
+  ngOnInit() {
+    // Lire les paramètres de l'URL
+    this.route.queryParamMap.subscribe(params => {
+      this.clientId = params.get('clientId');
+      console.log('Client ID:', this.clientId);
+
+      // Si le paramètre clientId est présent, déclencher l'authentification
+      if (this.clientId) {
+        this.triggerLogin();
+      }
+    });
+  }
+
+  triggerLogin() {
+    // Rediriger vers le backend pour initier l'authentification OIDC
+    window.location.href = `/login?clientId=${this.clientId}`;
+  }
+
+  // Exemple d'utilisation d'AuthService
+  callDirectPublicApi() {
+    this.authService.callDirectPublicHello().subscribe(data => {
+      console.log('Public API Response:', data);
+    });
+  }
+}
+

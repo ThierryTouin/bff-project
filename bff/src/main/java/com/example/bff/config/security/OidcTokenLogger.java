@@ -39,5 +39,6 @@ public class OidcTokenLogger implements AuthenticationSuccessHandler {
 
         // Redirection par défaut après authentification
         response.sendRedirect("/");
+
     }
 }
