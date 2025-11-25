@@ -60,7 +60,7 @@ Accès direct au container (non recomandé)
 ## Autologin
 http://localhost:3001?clientId=toto
 
-(ça logge et retourne le paramètre clientId=toto au frontend après connexion => cliquez sur UserInfo)
+(retourne le paramètre clientId=toto au frontend après connexion => cliquez sur UserInfo pour voir clientId=toto dans le json de retour)
 
 ## Ajout de swagger-ui en passant par nginx
 - Ajout des règles location /swagger-ui et location /v3/api-docs dans nginx.conf
