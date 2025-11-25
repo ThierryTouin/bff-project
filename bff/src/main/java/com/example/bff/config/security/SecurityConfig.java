@@ -6,8 +6,12 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+
+import com.example.bff.filter.CsrfLoggerFilter;
+import com.example.bff.filter.ParamHeaderFilter;
+import com.fasterxml.jackson.databind.deser.impl.CreatorCandidate.Param;
+
 import org.springframework.context.annotation.Bean;
 
 @Configuration
@@ -18,7 +22,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(
         HttpSecurity http,
         OidcTokenLogger oidcTokenLogger,
-        CsrfLoggerFilter csrfLoggerFilter
+        CsrfLoggerFilter csrfLoggerFilter,
+        ParamHeaderFilter paramHeaderFilter
     ) throws Exception {
 
         CookieCsrfTokenRepository repo = CookieCsrfTokenRepository.withHttpOnlyFalse();
@@ -36,6 +41,7 @@ public class SecurityConfig {
                 .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
             )
             .addFilterAfter(csrfLoggerFilter, UsernamePasswordAuthenticationFilter.class)
+            .addFilterAfter(paramHeaderFilter, UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(authz -> authz
                 .requestMatchers("/api/public/**").permitAll()
                 .requestMatchers(

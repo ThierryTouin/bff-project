@@ -1,4 +1,4 @@
-package com.example.bff.config.security;
+package com.example.bff.filter;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;

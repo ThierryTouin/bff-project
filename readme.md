@@ -57,6 +57,11 @@ Accès direct au container (non recomandé)
 
 - Keycloak : http://localhost:8080
 
+## Autologin
+http://localhost:3001?clientId=toto
+
+(ça logge et retourne le paramètre clientId=toto au frontend après connexion => cliquez sur UserInfo)
+
 ## Ajout de swagger-ui en passant par nginx
 - Ajout des règles location /swagger-ui et location /v3/api-docs dans nginx.conf
 - Dans Bff, 
