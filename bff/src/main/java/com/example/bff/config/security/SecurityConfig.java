@@ -12,6 +12,8 @@ import com.example.bff.filter.CsrfLoggerFilter;
 import com.example.bff.filter.ParamHeaderFilter;
 import com.fasterxml.jackson.databind.deser.impl.CreatorCandidate.Param;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.context.annotation.Bean;
 
 @Configuration
@@ -55,6 +57,14 @@ public class SecurityConfig {
                 .requestMatchers("/logout/**").authenticated()
                 .requestMatchers("/api/secur/**").authenticated()
                 .anyRequest().denyAll()
+            )
+            .exceptionHandling(ex -> ex
+                .authenticationEntryPoint((request, response, authException) -> {
+                    // Si appel AJAX : renvoie 401 au lieu d'une redirection
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.setContentType("application/json");
+                    response.getWriter().write("{\"error\":\"UNAUTHORIZED\"}");
+                })
             )
             .oauth2Login(oauth2 -> oauth2
                 .successHandler(oidcTokenLogger)
