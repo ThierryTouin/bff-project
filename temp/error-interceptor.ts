@@ -1,39 +1,73 @@
-import { Injectable } from '@angular/core';
-import { HttpEvent, HttpInterceptor, HttpHandler, HttpRequest, HttpErrorResponse } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { HttpInterceptorFn, HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { tap, catchError, throwError } from 'rxjs';
 
-@Injectable()
-export class ErrorInterceptor implements HttpInterceptor {
+export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
-  constructor(private router: Router) {}
+  const router = inject(Router);
 
-  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    return next.handle(req).pipe(
-      catchError((error: HttpErrorResponse) => {
+  return next(req).pipe(
 
-        if (error.status === 401) {
-          // Session expirée ou non authentifié
-          this.router.navigate(['/login'], {
-            queryParams: { redirect: this.router.url }
-          });
+    // Gestion erreurs fonctionnelles (réponse 200)
+    tap(event => {
+      if (event instanceof HttpResponse) {
+        const body = event.body;
+
+        if (body?.error === true && body?.code) {
+          handleFunctionalError(body.code, body.message, router);
         }
+      }
+    }),
 
-        else if (error.status === 403) {
-          // Authentifié mais pas les permissions
-          this.router.navigate(['/forbidden']);
-        }
+    // Gestion erreurs HTTP
+    catchError((error: HttpErrorResponse) => {
 
-        else if (error.status === 404) {
-          // Ressource introuvable
-          this.router.navigate(['/not-found']);
-        }
+      const functionalHeader = error.headers.get('X-App-Error');
+      if (functionalHeader) {
+        handleFunctionalError(functionalHeader, error.error, router);
+      }
 
-        // Tu peux aussi gérer le 500 ici si tu veux
+      switch (error.status) {
+        case 401:
+          router.navigate(['/login'], { queryParams: { redirect: router.url } });
+          break;
 
-        return throwError(() => error);
-      })
-    );
+        case 403:
+          router.navigate(['/forbidden']);
+          break;
+
+        case 404:
+          router.navigate(['/not-found']);
+          break;
+
+        case 500:
+          router.navigate(['/server-error']);
+          break;
+      }
+
+      return throwError(() => error);
+    })
+  );
+};
+
+
+function handleFunctionalError(code: string, message: string, router: Router) {
+
+  console.warn('Functional error:', code, message);
+
+  switch (code) {
+
+    case 'USER_BLOCKED':
+      router.navigate(['/account-blocked']);
+      break;
+
+    case 'OUT_OF_STOCK':
+      router.navigate(['/product-unavailable']);
+      break;
+
+    default:
+      router.navigate(['/functional-error'], { queryParams: { code } });
+      break;
   }
 }
