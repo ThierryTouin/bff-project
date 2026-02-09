@@ -51,6 +51,7 @@ services:
       - /app/node_modules   # évite les conflits node_modules host <-> container
     environment:
       - CHOKIDAR_USEPOLLING=true  # pour que le watcher fonctionne dans Docker
+      - GTM_ID=GTM-XXXXXXX  # Placeholder pour GTM-ID, à remplacer dynamiquement
 
 
   nginx:

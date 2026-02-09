@@ -1,5 +1,12 @@
 <div style="text-align:center">
   <h1>Welcome to the Angular BFF Example!</h1>
+  
+  <!-- Affichage du GTM-ID actuel -->
+  <!-- <div *ngIf="gtmId" style="background-color: #f0f0f0; padding: 10px; margin: 10px 0;"> -->
+  <div>
+    <strong>GTM ID:</strong> {{ gtmId }}
+  </div>
+  
   <button (click)="login()">Login</button>
   <button (click)="logout()">Logout</button><br>
   <button (click)="swagger()">Doc API</button><br>

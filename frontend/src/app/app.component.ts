@@ -1,7 +1,9 @@
 // frontend/src/app/app.component.ts
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { AuthService } from './auth.service';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HttpClient } from '@angular/common/http';
+import { GtmService } from './gtm.service';
+import { CommonModule } from '@angular/common';
 
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -9,11 +11,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 @Component({
   selector: 'app-auth',
   templateUrl: './app.component.html',
-  imports: [HttpClientModule],
+  standalone: true,
+  imports: [HttpClientModule, CommonModule],
   providers: [AuthService],
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   helloMessage: string = '';
+  gtmId: string | null = null;
 
   //constructor(private authService: AuthService) {}
 
@@ -21,10 +25,15 @@ export class AppComponent {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private authService: AuthService // Réintégration d'AuthService
+    private authService: AuthService, // Réintégration d'AuthService
+    private gtmService: GtmService
   ) {}
 
   ngOnInit() {
+    // Le GTM est maintenant initialisé automatiquement dans le constructeur du service
+    // Nous pouvons simplement récupérer l'ID actuel
+    this.gtmId = this.gtmService.getGtmId();
+    
     // Lire les paramètres de l'URL
     this.route.queryParamMap.subscribe(params => {
       this.clientId = params.get('clientId');
