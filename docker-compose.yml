@@ -11,6 +11,11 @@ services:
       KC_BOOTSTRAP_ADMIN_USERNAME: admin
       KC_BOOTSTRAP_ADMIN_PASSWORD: test01
 
+  fake-oidc:
+    build: ./fake-oidc
+    container_name: fake-oidc
+    ports:
+      - "8090:8080"
 
   bff:
     container_name: bff-bff
@@ -19,11 +24,14 @@ services:
       - "8081:8081"
       - "5005:5005"  # 🔥 Port de debug
     environment:
-      - SPRING_OIDC_ISSUER=http://bff-keycloak:8080/realms/myrealm
-      - SPRING_OIDC_CLIENT_ID=bff-client
-      - SPRING_OIDC_CLIENT_SECRET=bff-secret
+      - SPRING_OIDC_ISSUER=http://fake-oidc:8080
+      - SPRING_OIDC_CLIENT_ID=frontend
+      - SPRING_OIDC_CLIENT_SECRET=fake-secret
+      # - SPRING_OIDC_ISSUER=http://bff-keycloak:8080/realms/myrealm
+      # - SPRING_OIDC_CLIENT_ID=bff-client
+      # - SPRING_OIDC_CLIENT_SECRET=bff-secret
     #depends_on: [keycloak, apis]
-    depends_on: [keycloak]
+    depends_on: [keycloak,fake-oidc]
     volumes:
       - ~/.m2:/home/maven/.m2  # si l’utilisateur du conteneur est `maven`
       - ./bff:/app
