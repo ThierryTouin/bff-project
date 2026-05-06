@@ -6,7 +6,8 @@ RUN mvn clean package -DskipTests
 
 COPY wait-for-keycloak.sh /app/wait-for-keycloak.sh
 RUN chmod +x /app/wait-for-keycloak.sh
-ENTRYPOINT ["/app/wait-for-keycloak.sh"]
+# @KEYCLOAK-ENTRYPOINT-START
+# ENTRYPOINT ["/app/wait-for-keycloak.sh"]
+# @KEYCLOAK-ENTRYPOINT-END
 
-#CMD ["mvn", "spring-boot:run"]
 CMD ["mvn", "spring-boot:run", "-Dspring-boot.run.jvmArguments='-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005'"]

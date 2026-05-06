@@ -22,26 +22,30 @@ const jwk = {
 const ISSUER = "http://fake-oidc:8080";
 const CLIENT_ID = "frontend";
 
-function buildIdToken() {
-  return jwt.sign(
-    {
-      sub: "5b873c42-cd4b-40a4-8201-b2f3c3a1901f",
-      preferred_username: "uid001",
-      given_name: "Prenom1",
-      family_name: "Nom1",
-      email: "prenom1.nom1@entreprise.com",
-      iss: ISSUER,
-      aud: CLIENT_ID,
-      azp: CLIENT_ID,
-      scope: "openid profile email",
-    },
-    privateKey,
-    {
-      algorithm: "RS256",
-      expiresIn: "1h",
-      keyid: "fake-key",
-    }
-  );
+// Store nonce per authorization code
+const codeStore = new Map();
+
+function buildIdToken(nonce) {
+  const claims = {
+    sub: "5b873c42-cd4b-40a4-8201-b2f3c3a1901f",
+    name: "Prenom1 Nom1",
+    preferred_username: "uid001",
+    given_name: "Prenom1",
+    family_name: "Nom1",
+    email: "prenom1.nom1@entreprise.com",
+    iss: ISSUER,
+    aud: CLIENT_ID,
+    azp: CLIENT_ID,
+    scope: "openid profile email",
+  };
+  if (nonce) {
+    claims.nonce = nonce;
+  }
+  return jwt.sign(claims, privateKey, {
+    algorithm: "RS256",
+    expiresIn: "1h",
+    keyid: "fake-key",
+  });
 }
 
 app.get("/.well-known/openid-configuration", (req, res) => {
@@ -59,12 +63,17 @@ app.get("/.well-known/openid-configuration", (req, res) => {
 });
 
 app.get("/authorize", (req, res) => {
-  const { redirect_uri, state } = req.query;
-  res.redirect(`${redirect_uri}?code=fake-code&state=${state}`);
+  const { redirect_uri, state, nonce } = req.query;
+  const code = "fake-code-" + Date.now();
+  codeStore.set(code, { nonce });
+  res.redirect(`${redirect_uri}?code=${code}&state=${state}`);
 });
 
 app.post("/token", (req, res) => {
-  const idToken = buildIdToken();
+  const code = req.body.code;
+  const stored = codeStore.get(code) || {};
+  codeStore.delete(code);
+  const idToken = buildIdToken(stored.nonce);
   res.json({
     access_token: "fake-access-token",
     id_token: idToken,

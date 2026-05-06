@@ -1,41 +1,52 @@
 #version: "3.8"
 services:
-  keycloak:
-    image: quay.io/keycloak/keycloak:26.1.0
-    container_name: bff-keycloak
-    command: start-dev --import-realm
-    ports: ["8080:8080"]
-    volumes:
-      - ./keycloak/realm.json:/opt/keycloak/data/import/realm.json
-    environment:
-      KC_BOOTSTRAP_ADMIN_USERNAME: admin
-      KC_BOOTSTRAP_ADMIN_PASSWORD: test01
+  # @KEYCLOAK-SERVICE-START
+  # keycloak:
+    # image: quay.io/keycloak/keycloak:26.1.0
+    # container_name: bff-keycloak
+    # command: start-dev --import-realm
+    # ports: ["8080:8080"]
+    # volumes:
+      # - ./keycloak/realm.json:/opt/keycloak/data/import/realm.json
+    # environment:
+      # KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      # KC_BOOTSTRAP_ADMIN_PASSWORD: test01
+  # @KEYCLOAK-SERVICE-END
 
+  # @FAKEOIDC-SERVICE-START
   fake-oidc:
     build: ./fake-oidc
     container_name: fake-oidc
     ports:
-      - "8090:8080"
+      - "8080:8080"
+  # @FAKEOIDC-SERVICE-END
 
   bff:
     container_name: bff-bff
     build: ./bff
     ports:
       - "8081:8081"
-      - "5005:5005"  # 🔥 Port de debug
+      - "5005:5005"
     environment:
+      # @FAKEOIDC-ENV-START
       - SPRING_OIDC_ISSUER=http://fake-oidc:8080
       - SPRING_OIDC_CLIENT_ID=frontend
       - SPRING_OIDC_CLIENT_SECRET=fake-secret
+      # @FAKEOIDC-ENV-END
+      # @KEYCLOAK-ENV-START
       # - SPRING_OIDC_ISSUER=http://bff-keycloak:8080/realms/myrealm
       # - SPRING_OIDC_CLIENT_ID=bff-client
       # - SPRING_OIDC_CLIENT_SECRET=bff-secret
-    #depends_on: [keycloak, apis]
-    depends_on: [keycloak,fake-oidc]
+      # @KEYCLOAK-ENV-END
+    # @FAKEOIDC-DEPENDS-START
+    depends_on: [fake-oidc]
+    # @FAKEOIDC-DEPENDS-END
+    # @KEYCLOAK-DEPENDS-START
+    # depends_on: [keycloak]
+    # @KEYCLOAK-DEPENDS-END
     volumes:
-      - ~/.m2:/home/maven/.m2  # si l’utilisateur du conteneur est `maven`
+      - ~/.m2:/home/maven/.m2
       - ./bff:/app
-
 
   # apis:
   #   container_name: bff-apis
@@ -44,23 +55,21 @@ services:
   #   environment:
   #     - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWK-SET-URI=http://keycloak:8080/realms/myrealm/protocol/openid-connect/certs
   #   volumes:
-  #     - ~/.m2:/root/.m2  # monte le cache Maven du host dans le conteneur
-      
+  #     - ~/.m2:/root/.m2
+
   angular:
     container_name: bff-angular
-    build: 
+    build:
         context: ./frontend
         dockerfile: Dockerfile-prod
-        #dockerfile: Dockerfile
     ports: ["4200:4200"]
     depends_on: [bff]
     volumes:
       - ./frontend:/app
-      - /app/node_modules   # évite les conflits node_modules host <-> container
+      - /app/node_modules
     environment:
-      - CHOKIDAR_USEPOLLING=true  # pour que le watcher fonctionne dans Docker
-      - GTM_ID=GTM-XXXXXXX  # Placeholder pour GTM-ID, à remplacer dynamiquement
-
+      - CHOKIDAR_USEPOLLING=true
+      - GTM_ID=GTM-XXXXXXX
 
   nginx:
     container_name: bff-nginx
