@@ -2,7 +2,7 @@ import express from "express";
 import jwt from "jsonwebtoken";
 import { generateKeyPairSync } from "crypto";
 
-const PORT = 8090;
+const PORT = 8080;
 const ISSUER = `http://fake-oidc:${PORT}`;
 const CLIENT_ID = "frontend";
 const REDIRECT_URI_OVERRIDE = ""; // If set, overrides the redirect_uri from the authorize request
@@ -113,7 +113,12 @@ app.get("/authorize", (req, res) => {
   const effectiveRedirectUri = REDIRECT_URI_OVERRIDE || redirect_uri;
   const code = "fake-code-" + Date.now();
   codeStore.set(code, { nonce });
-  res.redirect(`${effectiveRedirectUri}?code=${code}&state=${state}`);
+  const redirectLocation = `${effectiveRedirectUri}?code=${code}&state=${state}`;
+  if (REDIRECT_URI_OVERRIDE) {
+    console.log(`  ${colors.yellow}Redirect override:${colors.reset} ${colors.dim}${redirect_uri}${colors.reset} ${colors.yellow}->${colors.reset} ${colors.cyan}${effectiveRedirectUri}${colors.reset}`);
+  }
+  console.log(`  ${colors.magenta}Redirecting to:${colors.reset} ${redirectLocation}`);
+  res.redirect(redirectLocation);
 });
 
 app.post("/token", (req, res) => {
@@ -141,5 +146,13 @@ app.get("/jwks", (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Fake OIDC running on ${PORT}`);
+  console.log(`\n${colors.green}========================================${colors.reset}`);
+  console.log(`${colors.green}  Fake OIDC Server started${colors.reset}`);
+  console.log(`${colors.green}========================================${colors.reset}`);
+  console.log(`  ${colors.cyan}Port:${colors.reset}                ${PORT}`);
+  console.log(`  ${colors.cyan}Issuer:${colors.reset}              ${ISSUER}`);
+  console.log(`  ${colors.cyan}Client ID:${colors.reset}           ${CLIENT_ID}`);
+  console.log(`  ${colors.cyan}Token expiration:${colors.reset}    ${TOKEN_EXPIRATION}`);
+  console.log(`  ${colors.cyan}Redirect override:${colors.reset}   ${REDIRECT_URI_OVERRIDE || "(none)"}`);
+  console.log(`${colors.green}========================================${colors.reset}\n`);
 });
