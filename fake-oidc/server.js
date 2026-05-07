@@ -6,6 +6,20 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+// Log all incoming requests
+app.use((req, res, next) => {
+  const timestamp = new Date().toISOString();
+  console.log(`[${timestamp}] ${req.method} ${req.originalUrl}`);
+  if (Object.keys(req.query).length > 0) {
+    console.log(`  Query params: ${JSON.stringify(req.query)}`);
+  }
+  if (req.body && Object.keys(req.body).length > 0) {
+    console.log(`  Body: ${JSON.stringify(req.body)}`);
+  }
+  console.log(`  Headers: ${JSON.stringify(req.headers)}`);
+  next();
+});
+
 const { privateKey, publicKey } = generateKeyPairSync("rsa", {
   modulusLength: 2048,
 });
