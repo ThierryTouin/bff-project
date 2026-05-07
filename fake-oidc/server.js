@@ -5,7 +5,7 @@ import { generateKeyPairSync } from "crypto";
 const PORT = 8080;
 const ISSUER = `http://fake-oidc:${PORT}`;
 const CLIENT_ID = "frontend";
-const REDIRECT_URI_OVERRIDE = ""; // If set, overrides the redirect_uri from the authorize request
+const REDIRECT_URI_OVERRIDE = ""; // If set, replaces the base URL (protocol+host+port) in redirect_uri
 const TOKEN_EXPIRATION = "1h"; // Token expiration (e.g. "1h", "30m", "7d")
 
 
@@ -110,7 +110,11 @@ app.get("/.well-known/openid-configuration", (req, res) => {
 
 app.get("/authorize", (req, res) => {
   const { redirect_uri, state, nonce } = req.query;
-  const effectiveRedirectUri = REDIRECT_URI_OVERRIDE || redirect_uri;
+  let effectiveRedirectUri = redirect_uri;
+  if (REDIRECT_URI_OVERRIDE) {
+    const url = new URL(redirect_uri);
+    effectiveRedirectUri = `${REDIRECT_URI_OVERRIDE}${url.pathname}`;
+  }
   const code = "fake-code-" + Date.now();
   codeStore.set(code, { nonce });
   const redirectLocation = `${effectiveRedirectUri}?code=${code}&state=${state}`;
