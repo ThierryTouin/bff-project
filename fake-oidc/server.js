@@ -2,21 +2,41 @@ import express from "express";
 import jwt from "jsonwebtoken";
 import { generateKeyPairSync } from "crypto";
 
+const PORT = 8090;
+const ISSUER = `http://fake-oidc:${PORT}`;
+const CLIENT_ID = "frontend";
+const REDIRECT_URI_OVERRIDE = ""; // If set, overrides the redirect_uri from the authorize request
+const TOKEN_EXPIRATION = "1h"; // Token expiration (e.g. "1h", "30m", "7d")
+
+
+
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+// ANSI color codes
+const colors = {
+  reset: "\x1b[0m",
+  dim: "\x1b[2m",
+  cyan: "\x1b[36m",
+  green: "\x1b[32m",
+  yellow: "\x1b[33m",
+  magenta: "\x1b[35m",
+  blue: "\x1b[34m",
+  white: "\x1b[37m",
+};
+
 // Log all incoming requests
 app.use((req, res, next) => {
   const timestamp = new Date().toISOString();
-  console.log(`[${timestamp}] ${req.method} ${req.originalUrl}`);
+  console.log(`${colors.dim}[${timestamp}]${colors.reset} ${colors.green}${req.method}${colors.reset} ${colors.cyan}${req.originalUrl}${colors.reset}`);
   if (Object.keys(req.query).length > 0) {
-    console.log(`  Query params: ${JSON.stringify(req.query)}`);
+    console.log(`  ${colors.yellow}Query params:${colors.reset} ${JSON.stringify(req.query)}`);
   }
   if (req.body && Object.keys(req.body).length > 0) {
-    console.log(`  Body: ${JSON.stringify(req.body)}`);
+    console.log(`  ${colors.magenta}Body:${colors.reset} ${JSON.stringify(req.body)}`);
   }
-  console.log(`  Headers: ${JSON.stringify(req.headers)}`);
+  console.log(`  ${colors.blue}Headers:${colors.reset} ${colors.dim}${JSON.stringify(req.headers)}${colors.reset}`);
   next();
 });
 
@@ -33,8 +53,19 @@ const jwk = {
   e: publicKey.export({ format: "jwk" }).e,
 };
 
-const ISSUER = "http://fake-oidc:8080";
-const CLIENT_ID = "frontend";
+
+function parseExpirationToSeconds(exp) {
+  const match = exp.match(/^(\d+)(s|m|h|d)$/);
+  if (!match) return 3600;
+  const value = parseInt(match[1]);
+  const unit = match[2];
+  switch (unit) {
+    case "s": return value;
+    case "m": return value * 60;
+    case "h": return value * 3600;
+    case "d": return value * 86400;
+  }
+}
 
 // Store nonce per authorization code
 const codeStore = new Map();
@@ -47,6 +78,7 @@ function buildIdToken(nonce) {
     given_name: "Prenom1",
     family_name: "Nom1",
     email: "prenom1.nom1@entreprise.com",
+    token: "fake-id-token",
     iss: ISSUER,
     aud: CLIENT_ID,
     azp: CLIENT_ID,
@@ -57,7 +89,7 @@ function buildIdToken(nonce) {
   }
   return jwt.sign(claims, privateKey, {
     algorithm: "RS256",
-    expiresIn: "1h",
+    expiresIn: TOKEN_EXPIRATION,
     keyid: "fake-key",
   });
 }
@@ -78,9 +110,10 @@ app.get("/.well-known/openid-configuration", (req, res) => {
 
 app.get("/authorize", (req, res) => {
   const { redirect_uri, state, nonce } = req.query;
+  const effectiveRedirectUri = REDIRECT_URI_OVERRIDE || redirect_uri;
   const code = "fake-code-" + Date.now();
   codeStore.set(code, { nonce });
-  res.redirect(`${redirect_uri}?code=${code}&state=${state}`);
+  res.redirect(`${effectiveRedirectUri}?code=${code}&state=${state}`);
 });
 
 app.post("/token", (req, res) => {
@@ -92,7 +125,7 @@ app.post("/token", (req, res) => {
     access_token: "fake-access-token",
     id_token: idToken,
     token_type: "Bearer",
-    expires_in: 3600,
+    expires_in: parseExpirationToSeconds(TOKEN_EXPIRATION),
   });
 });
 
@@ -107,6 +140,6 @@ app.get("/jwks", (req, res) => {
   res.json({ keys: [jwk] });
 });
 
-app.listen(8080, () => {
-  console.log("Fake OIDC running on 8080");
+app.listen(PORT, () => {
+  console.log(`Fake OIDC running on ${PORT}`);
 });
