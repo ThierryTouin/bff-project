@@ -10,6 +10,7 @@ import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 
 import com.example.bff.filter.CsrfLoggerFilter;
 import com.example.bff.filter.ParamHeaderFilter;
+import com.example.bff.filter.SessionDebugFilter;
 import com.fasterxml.jackson.databind.deser.impl.CreatorCandidate.Param;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -25,7 +26,8 @@ public class SecurityConfig {
         HttpSecurity http,
         OidcTokenLogger oidcTokenLogger,
         CsrfLoggerFilter csrfLoggerFilter,
-        ParamHeaderFilter paramHeaderFilter
+        ParamHeaderFilter paramHeaderFilter,
+        SessionDebugFilter sessionDebugFilter
     ) throws Exception {
 
         CookieCsrfTokenRepository repo = CookieCsrfTokenRepository.withHttpOnlyFalse();
@@ -42,6 +44,7 @@ public class SecurityConfig {
                 .csrfTokenRepository(repo)
                 .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
             )
+            .addFilterBefore(sessionDebugFilter, org.springframework.security.web.session.DisableEncodeUrlFilter.class)
             .addFilterAfter(csrfLoggerFilter, UsernamePasswordAuthenticationFilter.class)
             .addFilterAfter(paramHeaderFilter, UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(authz -> authz

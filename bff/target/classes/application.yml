@@ -37,12 +37,13 @@ spring:
 
 logging:
   level:
-    org.springframework.security: DEBUG
-    org.springframework.security.oauth2: DEBUG
-    org.springframework.web: DEBUG
-    org.springframework.boot.autoconfigure.security.oauth2: DEBUG
-    org.springframework.security.oauth2.client: DEBUG
-    org.springframework.security.oauth2.client.registration: DEBUG
+    com.example.bff: DEBUG
+    org.springframework.security: TRACE
+    org.springframework.security.oauth2: TRACE
+    org.springframework.web: TRACE
+    org.springframework.boot.autoconfigure.security.oauth2: TRACE
+    org.springframework.security.oauth2.client: TRACE
+    org.springframework.security.oauth2.client.registration: TRACE
 
 
 # application.properties
